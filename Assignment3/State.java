@@ -162,6 +162,10 @@ public class State{
 	}
 	
 	public int heuristic(int goalGold, int goalWood){
+		if(this.isGoalState(goalGold, goalWood)){
+			return 0;
+		}
+
 		int heuristic = 0;
 		int goldNeeded = goalGold - Gold;
 		int woodNeeded = goalWood - Wood;
@@ -181,8 +185,10 @@ public class State{
 		
 		GoldMine closestMine = closestGold(townhall.getX(), townhall.getY());
 		Forest closestForest = closestForest(townhall.getX(), townhall.getY());
-		heuristic += (2*(distToTownHall(closestMine.getX(), closestMine.getY())) + 1) * (goldNeeded/100);
-		heuristic += (2*(distToTownHall(closestForest.getX(), closestForest.getY())) + 1) * (woodNeeded/100);
+		if(goldNeeded > 0)
+			heuristic += (2*(distToTownHall(closestMine.getX(), closestMine.getY())) + 1) * (goldNeeded/100);
+		if(woodNeeded > 0)
+			heuristic += (2*(distToTownHall(closestForest.getX(), closestForest.getY())) + 1) * (woodNeeded/100);
 
 	
 		return heuristic;
