@@ -1,3 +1,4 @@
+package Assignment3;
 import java.util.Comparator;
 public class TotalCostComparator implements Comparator<StateNode> {
 
