@@ -7,7 +7,7 @@ import java.util.PriorityQueue;
 
 
 public class Planner {
-	public static StateNode plan(State state, ArrayList<StripsAction> actions, int goalGold, int goalWood){
+	public static StateNode plan(State state, List<StripsAction> actions, int goalGold, int goalWood){
 		// Create openlist
 		Comparator<StateNode> comparator = new TotalCostComparator();
 		PriorityQueue<StateNode> openList = new PriorityQueue<StateNode>();
@@ -21,7 +21,7 @@ public class Planner {
 		// Search for the path
 		return search(openList, closedList, actions, goalGold, goalWood);
 	}
-	private static StateNode search(PriorityQueue<StateNode> openList, List<StateNode> closedList, ArrayList<StripsAction> actions, int goalGold, int goalWood){
+	private static StateNode search(PriorityQueue<StateNode> openList, List<StateNode> closedList, List<StripsAction> actions, int goalGold, int goalWood){
 		if(openList.size() <=0){
 			// No path to be found
 			System.out.println("No Path Can be Found!");

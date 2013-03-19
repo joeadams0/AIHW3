@@ -70,6 +70,7 @@ public class PlanningAgent extends Agent {
 		actions.add(moveToWood);
 		actions.add(moveToTownhall);
 		
+		StateNode root = Planner.plan(state, actions, goldRequired, woodRequired);
 		
 		return middleStep(newstate, statehistory);
 	}
