@@ -4,9 +4,11 @@ import java.util.List;
 public class MoveToGoldAction implements StripsAction{
 	public MoveToGoldAction(){
 	}
-	// No Preconditions
+	// Has no cargo
 	public boolean precondition(State state){
-		return true;
+		Peasant p = state.getPeasant();
+		GoldMine t = state.findClosestMine();
+		return !state.getPeasant().hasCargo() && ((Math.abs(t.getX() - p.getX()) + Math.abs(t.getX() - p.getY()))>1);
 	}
 	// Moves to the nearest gold mine
 	public State postcondition(State state){
@@ -28,7 +30,7 @@ public class MoveToGoldAction implements StripsAction{
 		return makespan;
 	}
 	public String toString(){
-		return "Move to nearest GoldMine, precondition: none, postcondition: peasant is at goldmine";
+		return "Action:\nMove to nearest GoldMine, precondition: peasant has no cargo and must not be at the goldmine, postcondition: peasant is at goldmine";
 	}
 
 }

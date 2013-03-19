@@ -18,4 +18,8 @@ public class HarvestGoldAction implements StripsAction{
 	public int getMakespan(State state){
 		return 1;
 	}
+
+	public String toString(){
+		return "Action:\nHarvest Gold, precondition: next to a GoldMine that has Gold and peasant isnt carrying anything, postcondition: mine - 100 wood and peasant carrying gold";
+	}
 }

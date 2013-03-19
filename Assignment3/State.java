@@ -97,30 +97,49 @@ public class State{
 	
 	public GoldMine findClosestMine(){
 		Peasant p = peasant;
-		List<GoldMine> mines = GoldMines;
-		int x = p.getX();
-		int y = p.getY();
-		GoldMine closestMine = mines.get(0);
-		for(GoldMine mine: mines){
-			if((Math.abs(mine.getX() - x)+Math.abs(mine.getX()-y))<(Math.abs(closestMine.getX() - x)+Math.abs(closestMine.getY()-y))){
-				closestMine = mine;
-			}
-		}
-		return closestMine;
+		return closestGold(p.getX(), p.getY());
 	}
 	
 	public Forest findClosestForest(){
 		Peasant p = peasant;
+		return closestForest(p.getX(), p.getY());
+	}
+
+	public GoldMine closestGold(int x, int y){
+		List<GoldMine> mines = GoldMines;
+		GoldMine closestMine = null;
+		for(GoldMine mine: mines){
+			if(closestMine == null){
+				if(mine.getGold()>100){
+					closestMine = mine;
+				}
+				else
+					continue;
+			}
+			if((Math.abs(mine.getX() - x)+Math.abs(mine.getX()-y))<(Math.abs(closestMine.getX() - x)+Math.abs(closestMine.getY()-y))){
+				closestMine = mine; 
+			}
+		}
+		return closestMine;
+	}
+
+	public Forest closestForest(int x, int y){
 		List<Forest> forests = Forests;
-		int x = p.getX();
-		int y = p.getY();
-		Forest closestForest = forests.get(0);
+		Forest closestForest = null;
 		for(Forest forest: forests){
+			if(closestForest == null){
+				if(forest.getWood()>100){
+					closestForest = forest;
+				}
+				else
+					continue;
+			}
 			if((Math.abs(forest.getX() - x)+Math.abs(forest.getX()-y))<(Math.abs(closestForest.getX() - x)+Math.abs(closestForest.getY()-y))){
 				closestForest = forest;
 			}
 		}
 		return closestForest;
+
 	}
 	
 	public String toString(){
@@ -141,18 +160,23 @@ public class State{
 		
 		return str;
 	}
+	
 	public int heuristic(int goalGold, int goalWood){
 		int heuristic = 0;
 		int goldNeeded = goalGold - Gold;
 		int woodNeeded = goalWood - Wood;
+
+		if(goldNeeded == 0 && woodNeeded == 0){
+			return heuristic;
+		}
 		
 		if (peasant.hasWood()){
 			heuristic += distToTownHall(peasant.getX(), peasant.getY())+1;
-			goldNeeded -=100;
+			woodNeeded -=100;
 		}
 		else if (peasant.hasGold()){
 			heuristic += distToTownHall(peasant.getX(), peasant.getY())+1;
-			woodNeeded -= 100;
+			goldNeeded -= 100;
 		}
 		
 		GoldMine closestMine = closestGold(townhall.getX(), townhall.getY());
@@ -163,31 +187,11 @@ public class State{
 	
 		return heuristic;
 	}
-	public GoldMine closestGold(int x, int y){
-		int closest;
-		GoldMine closestMine = null;
-		for(GoldMine g : GoldMines){
-			if(g.getGold() > 0 && (closestMine == null || closest > dist(g.getX(), g.getY(), x, y))){
-				closest = dist(g.getX(), g.getY(), x, y);
-				closestMine = g;
-			}
-		}
-		return closestMine;
-	}
-	public Forest closestForest(int x, int y){
-		int closest;
-		Forest closestForest = null;
-		for(Forest f : Forests){
-			if(f.getWood() > 0 && (closestForest == null || closest > dist(f.getX(), f.getY(), x, y))){
-				closest = dist(f.getX(), f.getY(), x, y);
-				closestForest = f;
-			}
-		}
-		return closestForest;
-	}
+	
 	private int dist(int x1, int y1, int x2, int y2){
 		return Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1));
 	}
+	
 	private int distToTownHall(int x, int y){
 		return dist(x, y, townhall.getX(), townhall.getY());
 	}

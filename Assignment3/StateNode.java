@@ -1,15 +1,22 @@
 package Assignment3;
-public class StateNode {
+import java.lang.Comparable;
+public class StateNode implements Comparable<StateNode> {
 	private State state;
 	private StateNode child = null;
 	private StateNode parent = null;
 	private StripsAction parentAction=null;
 	private StripsAction nextAction=null;
 	private int cost;
-	public StateNode(State state, StateNode parentNode, StripsAction parentAction, int cost){
+	private int goalGold;
+	private int goalWood;
+
+	public StateNode(State state, StateNode parentNode, StripsAction parentAction, int cost, int goalGold, int goalWood){
 		this.state = state;
 		this.parent = parentNode;
+		this.parentAction = parentAction;
 		this.cost = cost;
+		this.goalGold = goalGold;
+		this.goalWood = goalWood;
 	}
 	public void setChild(StateNode childNode){
 		this.child = childNode;
@@ -27,7 +34,7 @@ public class StateNode {
 		return cost;
 	}
 	public int totalEstimatedCost(){
-		return (cost + state.heuristic());
+		return (cost + state.heuristic(goalGold, goalWood));
 	}
 	public StripsAction getParentAction(){
 		return parentAction;
@@ -46,7 +53,27 @@ public class StateNode {
 		return ( node.getState().equals(this.state) );
 	}
 	public boolean reachesGoal(int goalGold, int goalWood){
-		return( goalGold <= state.getGold() && goalWood <= state.getWood());
+		return state.isGoalState(goalGold, goalWood);
 	}
+
+	@Override
+	public int compareTo(StateNode y)
+	{
+	    // Assume neither string is null. Real code should
+        // probably be more robust
+        if (this.totalEstimatedCost() < y.totalEstimatedCost())
+        {
+            return -1;
+        }
+        if (this.totalEstimatedCost() > y.totalEstimatedCost())
+        {
+            return 1;
+        }
+        return 0;
+    }
+
+    public String toString(){
+    	return "StateNode:\n" + parentAction + "\n"+ state + "\nCost: " + cost +"\n";
+    }
 }
 

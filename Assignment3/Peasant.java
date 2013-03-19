@@ -12,7 +12,7 @@ public class Peasant{
 		this.Gold = false;
 	}
 	
-	public Peasant(int X, int Y, boolean HasWood, boolean HasGold){
+	public Peasant(int X, int Y, boolean HasGold, boolean HasWood){
 		this.X = X;
 		this.Y = Y;
 		this.Wood = HasWood;

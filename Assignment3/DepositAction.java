@@ -21,10 +21,15 @@ public class DepositAction implements StripsAction{
 		}
 		newState.getPeasant().setGold(false);
 		newState.getPeasant().setWood(false);
+		//System.out.println("OLD STATE:\n" + state + "\nNEW STATE\n" + newState + "\n");
 		return newState;
 	}
 	
 	public int getMakespan(State state){
 		return 1;
+	}
+
+	public String toString(){
+		return "Action:\nDeposit, precondition: next to townhall and carrying something, postcondition: townhall + 100 of either wood or gold and peasant has no cargo";
 	}
 }

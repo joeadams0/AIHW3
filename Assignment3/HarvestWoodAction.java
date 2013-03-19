@@ -19,4 +19,8 @@ public class HarvestWoodAction implements StripsAction{
 	public int getMakespan(State state){
 		return 1;
 	}
+
+	public String toString(){
+		return "Action:\nHarvest Wood, precondition: next to a forest that has wood and peasant isnt carrying anything, postcondition: forest - 100 wood and peasant carrying wood";
+	}
 }

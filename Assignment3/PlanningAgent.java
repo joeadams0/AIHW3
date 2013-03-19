@@ -69,8 +69,12 @@ public class PlanningAgent extends Agent {
 		actions.add(moveToGold);
 		actions.add(moveToWood);
 		actions.add(moveToTownhall);
-		
+
 		StateNode root = Planner.plan(state, actions, goldRequired, woodRequired);
+		while(root.getChild() != null){
+			root = root.getChild();
+			System.out.println(root);
+		}
 		
 		return middleStep(newstate, statehistory);
 	}
@@ -86,6 +90,7 @@ public class PlanningAgent extends Agent {
 	@Override
 	public void terminalStep(StateView newstate, History.HistoryView statehistory) {
 		step++;
+		System.out.println("DONE!");
 	}
 	
 	public static String getUsage() {
@@ -143,6 +148,42 @@ public class PlanningAgent extends Agent {
 	
 	private Forest generateForest(ResourceView resource){
 		return new Forest(resource.getXPosition(), resource.getYPosition(), resource.getAmountRemaining());
+	}
+
+	private ResourceView findNearestResource(int x, int y, Type type){
+		List<ResourceView> resources = currentState.getAllResourceNodes();
+		ResourceView nearestResource = resources.get(0);
+		for(ResourceView resource: resources){
+			if(resource.getType() == type){
+				if(distance(resource.getXPosition(), resource.getYPosition(), x, y) < distance(nearestResource.getXPosition(), nearestResource.getYPosition(), x, y)){
+					nearestResource = resource;
+				}
+			}
+		}
+		return nearestResource;
+	}
+
+	private ResourceView findNearestMine(int x, int y){
+		return findNearestResource(x, y, Type.GOLD_MINE);
+	}
+
+	private ResourceView findNearestForest(int x, int y){
+		return findNearestResource(x, y, Type.TREE);
+	}
+
+	private UnitView getPeasant(){
+		List<UnitView> units = currentState.getUnits(playernum);
+		for(UnitView unit : units){
+			String unitTypeName = unit.getTemplateView().getName();
+			if(unitTypeName.equals("Peasant")){
+				return unit;
+			}
+		}
+		return null;
+	}
+
+	private int distance(int x1, int y1, int x2, int y2){
+		return (Math.abs(x1 - x2) + Math.abs(y1 - y2));
 	}
 	
 	private int getCurrentGold(){

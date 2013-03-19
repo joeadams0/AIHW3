@@ -9,13 +9,12 @@ import java.util.PriorityQueue;
 public class Planner {
 	public static StateNode plan(State state, List<StripsAction> actions, int goalGold, int goalWood){
 		// Create openlist
-		Comparator<StateNode> comparator = new TotalCostComparator();
 		PriorityQueue<StateNode> openList = new PriorityQueue<StateNode>();
 		
 		// Create ClosedList
 		List<StateNode> closedList = new ArrayList<StateNode>();
 		
-		StateNode root = new StateNode(state, null, null, 0);
+		StateNode root = new StateNode(state, null, null, 0, goalGold, goalWood);
 		openList.add(root);
 		
 		// Search for the path
@@ -27,8 +26,10 @@ public class Planner {
 			System.out.println("No Path Can be Found!");
 			return null;
 		}
+		
 		StateNode head = openList.peek();
 		openList.remove(head);
+
 
 		// If it is the goal state
 		if(head.reachesGoal(goalGold, goalWood)){
@@ -38,7 +39,7 @@ public class Planner {
 		
 		// Expand Node
 		else{
-			List<StateNode> neighbors = possibleMoves(head, actions);
+			List<StateNode> neighbors = possibleMoves(head, actions, goalGold, goalWood);
 			StateNode neighbor = null;
 			for(int i = 0; i < neighbors.size(); i++){
 				neighbor = neighbors.get(i);
@@ -74,11 +75,11 @@ public class Planner {
 			}
 		}
 	}
-	private static List<StateNode> possibleMoves(StateNode head, List<StripsAction> actions){
+	private static List<StateNode> possibleMoves(StateNode head, List<StripsAction> actions, int goalGold, int goalWood){
 		List<StateNode> possibleNextStates = new ArrayList<StateNode>();
 		for(StripsAction a : actions){
 			if(a.precondition(head.getState())){
-				StateNode tmp = new StateNode(a.postcondition(head.getState()), head, a, head.getCost() + a.getMakespan(head.getState()));
+				StateNode tmp = new StateNode(a.postcondition(head.getState()), head, a, head.getCost() + a.getMakespan(head.getState()), goalGold, goalWood);
 				possibleNextStates.add(tmp);
 			}
 		}
@@ -96,5 +97,16 @@ public class Planner {
 			temp = tempParent;
 		}
 		return temp;
+	}
+
+	private static void printOpenList(PriorityQueue<StateNode> openList){
+		StateNode head = openList.peek();
+		if(head == null){
+			return;
+		}
+		System.out.println(head);
+		openList.remove(head);
+		printOpenList(openList);
+		openList.add(head);
 	}
 }
