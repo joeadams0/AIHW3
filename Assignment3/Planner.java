@@ -10,7 +10,7 @@ public class Planner {
 	public static StateNode plan(State state, ArrayList<StripsAction> actions, int goalGold, int goalWood){
 		// Create openlist
 		Comparator<StateNode> comparator = new TotalCostComparator();
-		PriorityQueue<StateNode> openList = new PriorityQueue<StateNode>();
+		PriorityQueue<StateNode> openList = new PriorityQueue<StateNode>(comparator);
 		
 		// Create ClosedList
 		List<StateNode> closedList = new ArrayList<StateNode>();
