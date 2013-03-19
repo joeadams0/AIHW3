@@ -1,12 +1,11 @@
-public class GoldMine{
+package Assignment3;
+public class Townhall{
 	private int X;
 	private int Y;
-	private int Gold;
 	
-	public GoldMine(int X, int Y, int Gold){
+	public Townhall(int X, int Y){
 		this.X = X;
 		this.Y = Y;
-		this.Gold = Gold;
 	}
 	
 	public int getX(){
@@ -14,9 +13,6 @@ public class GoldMine{
 	}
 	public int getY(){
 		return Y;
-	}
-	public int getGold(){
-		return Gold;
 	}
 	
 	public void setX(int X){
@@ -29,11 +25,16 @@ public class GoldMine{
 		this.X = X;
 		this.Y = Y;
 	}
-	public void setGold(int Gold){
-		this.Gold = Gold;
+	
+	public boolean equals(Townhall t){
+		return X == t.getX() && Y == t.getY();
 	}
 	
-	public boolean equals(GoldMine g){
-		return X == g.getX() && Y == g.getY() && Gold == g.getGold();
+	public Townhall clone(){
+		return new Townhall(X, Y);
+	}
+	
+	public String toString(){
+		return "Townhall: "+ X + ", " + Y;
 	}
 }

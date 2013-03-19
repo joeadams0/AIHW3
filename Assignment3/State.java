@@ -1,3 +1,4 @@
+package Assignment3;
 import java.util.List;
 import java.util.ArrayList;
 public class State{
@@ -123,5 +124,24 @@ public class State{
 			}
 		}
 		return closestForest;
+	}
+	
+	public String toString(){
+		String str = "State:\n";
+		for(GoldMine mine : GoldMines){
+			str = str + mine.toString() + "\n";
+		}
+		str = str + "\n";
+		for(Forest forest : Forests){
+			str = str + forest.toString() + "\n";
+		}
+		str = str + "\n";
+		
+		str = str + townhall.toString() + "\n";
+		str = str + peasant.toString() + "\n";
+		str = str + "Gold: " + Gold + "\n";
+		str = str + "Wood: " + Wood + "\n";
+		
+		return str;
 	}
 }

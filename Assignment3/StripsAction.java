@@ -1,3 +1,4 @@
+package Assignment3;
 public interface StripsAction{
 	public boolean precondition(State state);
 	public State postcondition(State state);

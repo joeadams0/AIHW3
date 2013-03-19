@@ -1,3 +1,4 @@
+package Assignment3;
 public class Forest{
 	private int X;
 	private int Y;
@@ -35,5 +36,13 @@ public class Forest{
 	
 	public boolean equals(Forest f){
 		return X == f.getX() && Y == f.getY() && Wood == f.getWood();
+	}
+	
+	public Forest clone(){
+		return new Forest(X, Y, Wood);
+	}
+	
+	public String toString(){
+		return "Forest: "+ X + ", " + Y + ", " + Wood;
 	}
 }
