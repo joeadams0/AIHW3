@@ -34,4 +34,8 @@ public class Peasant{
 	public void setCargo(boolean Cargo){
 		this.Cargo = Cargo;
 	}
+	
+	public boolean equals(Peasant p){
+		return X == p.getX() && Y == p.getY() && Cargo == p.hasCargo();
+	}
 }

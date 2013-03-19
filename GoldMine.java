@@ -32,4 +32,8 @@ public class GoldMine{
 	public void setGold(int Gold){
 		this.Gold = Gold;
 	}
+	
+	public boolean equals(GoldMine g){
+		return X == g.getX() && Y == g.getY() && Gold == g.getGold();
+	}
 }

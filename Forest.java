@@ -32,4 +32,8 @@ public class Forest{
 	public void setWood(int Wood){
 		this.Wood = Wood;
 	}
+	
+	public boolean equals(Forest f){
+		return X == f.getX() && Y == f.getY() && Wood == f.getWood();
+	}
 }
