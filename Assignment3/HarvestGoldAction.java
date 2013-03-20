@@ -6,7 +6,8 @@ public class HarvestGoldAction implements StripsAction{
 	public boolean precondition(State state){
 		GoldMine m = state.findClosestMine();
 		Peasant p = state.getPeasant();
-		return !(p.hasCargo()) && Math.abs(m.getX() - p.getX())<=1 && Math.abs(m.getY() - p.getY())<=1 && m.getGold() >= 100;
+		//System.out.println("Close enough: (" + m.getX() + ", " + m.getY() + "), ("+ p.getX()+", "+p.getY()+")");
+		return !(p.hasCargo()) && Math.abs(m.getX() - p.getX())<=1 && Math.abs(m.getY() - p.getY())<=1 && m.getGold() > 0;
 	}
 	public State postcondition(State state){
 		State newState = state.clone();
@@ -20,6 +21,6 @@ public class HarvestGoldAction implements StripsAction{
 	}
 
 	public String toString(){
-		return "Action:\nHarvest Gold, precondition: next to a GoldMine that has Gold and peasant isnt carrying anything, postcondition: mine - 100 wood and peasant carrying gold";
+		return "Harvest Gold, precondition: next to a GoldMine that has Gold and peasant isnt carrying anything, postcondition: mine - 100 wood and peasant carrying gold";
 	}
 }

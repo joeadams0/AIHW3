@@ -109,14 +109,13 @@ public class State{
 		List<GoldMine> mines = GoldMines;
 		GoldMine closestMine = null;
 		for(GoldMine mine: mines){
-			if(closestMine == null){
-				if(mine.getGold()>100){
-					closestMine = mine;
-				}
-				else
-					continue;
+			if(!(mine.getGold()>=100)){
+					continue;	
 			}
-			if((Math.abs(mine.getX() - x)+Math.abs(mine.getX()-y))<(Math.abs(closestMine.getX() - x)+Math.abs(closestMine.getY()-y))){
+			if(closestMine == null){
+				closestMine = mine;
+			}
+			else if(Math.max(Math.abs(mine.getX() - x),Math.abs(mine.getY()-y))<Math.max(Math.abs(closestMine.getX() - x),Math.abs(closestMine.getY()-y))){
 				closestMine = mine; 
 			}
 		}
@@ -127,14 +126,13 @@ public class State{
 		List<Forest> forests = Forests;
 		Forest closestForest = null;
 		for(Forest forest: forests){
-			if(closestForest == null){
-				if(forest.getWood()>100){
-					closestForest = forest;
-				}
-				else
-					continue;
+			if(!(forest.getWood()>100)){
+				continue;
 			}
-			if((Math.abs(forest.getX() - x)+Math.abs(forest.getX()-y))<(Math.abs(closestForest.getX() - x)+Math.abs(closestForest.getY()-y))){
+			if(closestForest == null){
+				closestForest = forest;
+			}
+			else if(Math.max(Math.abs(forest.getX() - x),Math.abs(forest.getY()-y))<Math.max(Math.abs(closestForest.getX() - x),Math.abs(closestForest.getY()-y))){
 				closestForest = forest;
 			}
 		}

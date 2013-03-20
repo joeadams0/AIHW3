@@ -21,6 +21,6 @@ public class HarvestWoodAction implements StripsAction{
 	}
 
 	public String toString(){
-		return "Action:\nHarvest Wood, precondition: next to a forest that has wood and peasant isnt carrying anything, postcondition: forest - 100 wood and peasant carrying wood";
+		return "Harvest Wood, precondition: next to a forest that has wood and peasant isnt carrying anything, postcondition: forest - 100 wood and peasant carrying wood";
 	}
 }

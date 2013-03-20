@@ -8,7 +8,7 @@ public class MoveToWoodAction implements StripsAction{
 	public boolean precondition(State state){
 		Peasant p = state.getPeasant();
 		Forest t = state.findClosestForest();
-		return !state.getPeasant().hasCargo() && ((Math.abs(t.getX() - p.getX()) + Math.abs(t.getX() - p.getY()))>1);
+		return !state.getPeasant().hasCargo() && ((Math.abs(t.getX() - p.getX())>1 &&  (Math.abs(t.getX() - p.getY()))>1));
 	}
 	// Moves to the nearest Forest
 	public State postcondition(State state){
@@ -30,7 +30,7 @@ public class MoveToWoodAction implements StripsAction{
 		return makespan;
 	}
 	public String toString(){
-		return "Action:\nMove to nearest Forest, precondition: peasant has no cargo and peasant is not already at the forest, postcondition: peasant is at Forest";
+		return "Move to nearest Forest, precondition: peasant has no cargo and peasant is not already at the forest, postcondition: peasant is at Forest";
 	}
 
 }

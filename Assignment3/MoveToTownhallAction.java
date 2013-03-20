@@ -8,7 +8,7 @@ public class MoveToTownhallAction implements StripsAction{
 	public boolean precondition(State state){
 		Peasant p = state.getPeasant();
 		Townhall t = state.getTownhall();
-		return state.getPeasant().hasCargo() && ((Math.abs(t.getX() - p.getX()) + Math.abs(t.getX() - p.getY()))>1);
+		return state.getPeasant().hasCargo() && ((Math.abs(t.getX() - p.getX())>1 &&  (Math.abs(t.getX() - p.getY()))>1));
 	}
 	
 	// Moves to the townhall
@@ -33,7 +33,7 @@ public class MoveToTownhallAction implements StripsAction{
 		return makespan;
 	}
 	public String toString(){
-		return "Action:\nMove to the townhall, precondition: peasant has cargo and peasant not at townhall, postcondition: peasant is at the townhall";
+		return "Move to the townhall, precondition: peasant has cargo and peasant not at townhall, postcondition: peasant is at the townhall";
 	}
 	
 }
