@@ -1,0 +1,4 @@
+*.class
+*.pdf
+saves/*
+/nbproject/private/
