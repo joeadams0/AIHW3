@@ -79,7 +79,7 @@ public class State{
 			return false;
 		if(Wood != state.getWood())
 			return false;
-		if(!(peasant.equals(state.getPeasant())))
+		if(!(Peasants.equals(state.getPeasants())))
 			return false;			
 		if(!(townhall.equals(state.getTownhall())))
 			return false;
@@ -105,17 +105,15 @@ public class State{
 			peasants.add(peasant.clone());
 		}
 		
-		return new State(mines, forests, gold, wood, p, t);
+		return new State(mines, forests, gold, wood, peasants, t);
 	}
 	
 	public GoldMine findClosestMine(){
-		Peasant p = peasant;
-		return closestGold(p.getX(), p.getY());
+		return closestGold(townhall.getX(), townhall.getY());
 	}
 	
 	public Forest findClosestForest(){
-		Peasant p = peasant;
-		return closestForest(p.getX(), p.getY());
+		return closestForest(townhall.getX(), townhall.getY());
 	}
 
 	public GoldMine closestGold(int x, int y){
@@ -165,7 +163,7 @@ public class State{
 		str = str + "\n";
 		
 		str = str + townhall.toString() + "\n";
-		str = str + peasant.toString() + "\n";
+		str = str + Peasants.toString() + "\n";
 		str = str + "Gold: " + Gold + "\n";
 		str = str + "Wood: " + Wood + "\n";
 		
@@ -185,6 +183,34 @@ public class State{
 		if(goldNeeded <= 0 && woodNeeded <= 0){
 			return heuristic;
 		}
+		
+		//start new stuff
+		int actionsRequired = 0;
+		if(goldNeeded > 0)
+			actionsRequired += (goldNeeded/100)*4;
+		if(woodNeeded > 0)
+			actionsRequired += (woodNeeded/100)*4;
+		
+		for(Peasant p : Peasants){
+			if(p.hasWood()){
+				if(woodNeeded <= 0){
+					actionsRequired += 2;
+				}
+				else{
+					actionsRequired -= 2;
+				}
+			}
+			else if (p.hasGold()){
+				if(goldNeeded <= 0){
+					actionsRequired += 2;
+				}
+				else{
+					actionsRequired -= 2;
+				}
+			}
+		}
+		heuristic = (int)Math.ceil((double)actionsRequired/(double)Peasants.size());
+		/*
 		if(goldNeeded<0){
 			heuristic -= goldNeeded;
 		}
@@ -207,7 +233,7 @@ public class State{
 			heuristic += (2*(distToTownHall(closestMine.getX(), closestMine.getY())) + 1) * (goldNeeded/100);
 		if(woodNeeded > 0)
 			heuristic += (2*(distToTownHall(closestForest.getX(), closestForest.getY())) + 1) * (woodNeeded/100);
-
+      */
 	
 		return heuristic;
 	}
