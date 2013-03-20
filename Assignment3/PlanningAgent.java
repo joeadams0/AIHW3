@@ -156,7 +156,7 @@ public class PlanningAgent extends Agent {
 	}
 
 	private State generateState(){
-		Peasant p = null;
+		List<Peasant> p = null;
 		Townhall t = null;
 		List<GoldMine> mines = new ArrayList<GoldMine>();
 		List<Forest> forests = new ArrayList<Forest>();
@@ -165,7 +165,7 @@ public class PlanningAgent extends Agent {
 		for(UnitView unit : units){
 			String unitTypeName = unit.getTemplateView().getName();
 			if(unitTypeName.equals("Peasant")){
-				p = generatePeasant(unit);
+				p.add(generatePeasant(unit));
 			}
 			else if(unitTypeName.equals("TownHall")){
 				t = generateTownhall(unit);

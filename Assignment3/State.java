@@ -6,15 +6,15 @@ public class State{
 	private List<Forest> Forests;
 	private int Gold;
 	private int Wood;
-	private Peasant peasant;
+	private List<Peasant> Peasants;
 	private Townhall townhall;
 	
-	public State(List<GoldMine> mines, List<Forest> forests, int gold, int wood, Peasant p, Townhall townhall){
+	public State(List<GoldMine> mines, List<Forest> forests, int gold, int wood, List<Peasant> p, Townhall townhall){
 		GoldMines = mines;
 		Forests = forests;
 		Gold = gold;
 		Wood = wood;
-		peasant = p;
+		Peasants = p;
 		this.townhall = townhall;
 	}
 	public List<GoldMine> getGoldMines(){
@@ -26,7 +26,11 @@ public class State{
 	}
 	
 	public Peasant getPeasant(){
-		return peasant;
+		return Peasants.get(0);
+	}
+
+	public List<Peasant> getPeasants(){
+		return Peasants;
 	}
 	
 	public int getGold(){
@@ -57,12 +61,18 @@ public class State{
 	public boolean equals(State state){
 		List<GoldMine> otherMines = state.getGoldMines();
 		List<Forest> otherForests = state.getForests();
+		List<Peasant> otherPeasants = state.getPeasants();
+
 		for(int i = 0; i < GoldMines.size(); i++){
 			if(!(GoldMines.get(i).equals(otherMines.get(i))))
 				return false;
 		}
 		for(int i = 0; i < Forests.size(); i++){
 			if(!(Forests.get(i).equals(otherForests.get(i))))
+				return false;
+		}
+		for(int i = 0; i < Peasants.size(); i++){
+			if(!(Peasants.get(i).equals(otherPeasants.get(i))))
 				return false;
 		}
 		if(Gold != state.getGold())
@@ -80,9 +90,9 @@ public class State{
 	public State clone(){
 		List<GoldMine> mines = new ArrayList<GoldMine>();
 		List<Forest> forests = new ArrayList<Forest>();
+		List<Peasant> peasants = new ArrayList<Peasant>();
 		int gold = Gold;
 		int wood = Wood;
-		Peasant p = peasant.clone();
 		Townhall t = townhall.clone();
 		
 		for(GoldMine mine : GoldMines){
@@ -90,6 +100,9 @@ public class State{
 		}
 		for(Forest forest : Forests){
 			forests.add(forest.clone());
+		}
+		for(Peasant peasant : Peasants){
+			peasants.add(peasant.clone());
 		}
 		
 		return new State(mines, forests, gold, wood, p, t);
