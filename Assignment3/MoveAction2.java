@@ -30,8 +30,8 @@ public class MoveAction2 implements StripsAction{
 		List<Peasant> peasants = findEligablePeasants(state);
 		int makespan = 0;
 		for(Peasant p : peasants){
-			int dist = Math.max(Math.abs(Location.getX()-p.getX()), Math.abs(Location.getY()-p.getY()));
-			if( dist> makespan){
+			int dist = Math.abs(Location.getX()-p.getX())+ Math.abs(Location.getY()-p.getY());
+			if(dist < makespan){
 				makespan =dist;
 			}
 		}

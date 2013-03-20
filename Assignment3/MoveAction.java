@@ -33,10 +33,7 @@ public class MoveAction implements StripsAction{
 	public int getMakespan(State state){
 		List<Peasant> peasants = findEligablePeasants(state);
 		Peasant p = peasants.get(0);
-		int makespan = Math.abs(Location.getX()-p.getX());
-		if(Math.abs(Location.getY()-p.getY()) < makespan){
-			makespan = Math.abs(Location.getY()-p.getY());
-		}
+		int makespan = Math.abs(Location.getX()-p.getX())+ Math.abs(Location.getY()-p.getY());
 		return makespan;
 	}
 	public String toString(){
