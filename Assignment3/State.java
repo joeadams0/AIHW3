@@ -114,13 +114,11 @@ public class State{
 	}
 	
 	public GoldMine findClosestMine(){
-		Townhall t = townhall;
-		return closestGold(t.getX(), t.getY());
+		return closestGold(townhall.getX(), townhall.getY());
 	}
 	
 	public Forest findClosestForest(){
-		Townhall t = townhall;
-		return closestForest(t.getX(), t.getY());
+		return closestForest(townhall.getX(), townhall.getY());
 	}
 
 	public GoldMine closestGold(int x, int y){
@@ -190,10 +188,38 @@ public class State{
 		int heuristic = 0;
 		int goldNeeded = goalGold - Gold;
 		int woodNeeded = goalWood - Wood;
-		/*
+
 		if(goldNeeded <= 0 && woodNeeded <= 0){
 			return heuristic;
 		}
+		
+		//start new stuff
+		int actionsRequired = 0;
+		if(goldNeeded > 0)
+			actionsRequired += (goldNeeded/100)*4;
+		if(woodNeeded > 0)
+			actionsRequired += (woodNeeded/100)*4;
+		
+		for(Peasant p : Peasants){
+			if(p.hasWood()){
+				if(woodNeeded <= 0){
+					actionsRequired += 2;
+				}
+				else{
+					actionsRequired -= 2;
+				}
+			}
+			else if (p.hasGold()){
+				if(goldNeeded <= 0){
+					actionsRequired += 2;
+				}
+				else{
+					actionsRequired -= 2;
+				}
+			}
+		}
+		heuristic = (int)Math.ceil((double)actionsRequired/(double)Peasants.size());
+		/*
 		if(goldNeeded<0){
 			heuristic -= goldNeeded;
 		}
@@ -208,7 +234,7 @@ public class State{
 		else if (peasant.hasGold()){
 			heuristic += distToTownHall(peasant.getX(), peasant.getY())+1;
 			goldNeeded -= 100;
-		}*/
+		}
 		
 		GoldMine closestMine = closestGold(townhall.getX(), townhall.getY());
 		Forest closestForest = closestForest(townhall.getX(), townhall.getY());
@@ -216,7 +242,7 @@ public class State{
 			heuristic += (2*(distToTownHall(closestMine.getX(), closestMine.getY())) + 1) * (goldNeeded/100);
 		if(woodNeeded > 0)
 			heuristic += (2*(distToTownHall(closestForest.getX(), closestForest.getY())) + 1) * (woodNeeded/100);
-
+      */
 	
 		return heuristic;
 	}
