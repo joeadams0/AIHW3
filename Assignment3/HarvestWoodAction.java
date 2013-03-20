@@ -7,7 +7,8 @@ public class HarvestWoodAction implements StripsAction{
 	public boolean precondition(State state){
 		Forest f = state.findClosestForest();
 		Peasant p = state.getPeasant();
-		return !(p.hasCargo()) && Math.abs(f.getX() - p.getX())<=1 && Math.abs(f.getY() - p.getY())<=1 && f.getWood() >= 100;
+		boolean bool = !(p.hasCargo()) && Math.abs(f.getX() - p.getX())<=1 && Math.abs(f.getY() - p.getY())<=1 && f.getWood() >= 100;
+		return bool;
 	}
 	public State postcondition(State state){
 		State newState = state.clone();

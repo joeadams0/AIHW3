@@ -60,8 +60,8 @@ public class PlanningAgent extends Agent {
 		StateNode root = currentNode;
 		if(root!= null){
 			while(root.getChild() != null){
+				System.out.println(root.getNextAction());
 				root = root.getChild();
-				System.out.println(root);
 			}
 		}
 		return middleStep(newstate, statehistory);
@@ -75,9 +75,13 @@ public class PlanningAgent extends Agent {
 		if(currentNode == null){
 			return builder;
 		}
+		if(currentNode.getNextAction() == null){
+			return builder;
+		}
 
 		UnitView p = getPeasant();
 		State state = generateState();
+		//System.out.println("CurrentNode:\n" + currentNode.getState() + "\nCurrent State:\n" + state + "\nPrecondition:\n"+ currentNode.getNextAction().precondition(state));
 		// Perform next action
 		if(currentNode.getNextAction().precondition(state)){
 			StripsAction action = currentNode.getNextAction();
@@ -110,7 +114,10 @@ public class PlanningAgent extends Agent {
 		{
 			logger.fine("Congratulations! You have finished the task!");
 		}
-		System.out.println("Success");
+		System.out.println("=> Step: " + step);
+		System.out.println("Current Gold: " + currentGold);
+		System.out.println("Current Wood: " + currentWood);
+		System.out.println("Congratulations! You have finished the task!");
 	}
 
 	public static String getUsage() {
@@ -224,13 +231,12 @@ public class PlanningAgent extends Agent {
 		else if(action instanceof HarvestGoldAction){
 			System.out.println("Performing Harvest Gold");
 			ResourceView mine = findNearestMine(peasant.getXPosition(), peasant.getYPosition());
-			return Action.createPrimitiveGather(peasant.getID(), Direction.getDirection((mine.getXPosition()-peasant.getXPosition()), (mine.getYPosition()-peasant.getYPosition())));
+			return Action.createCompoundGather(peasant.getID(), mine.getID());
 		}
 		else if(action instanceof HarvestWoodAction){
 			System.out.println("Performing Harvest Wood");
 			ResourceView forest = findNearestForest(peasant.getXPosition(), peasant.getYPosition());
-			System.out.println(forest.getID());
-			return Action.createPrimitiveGather(peasant.getID(), Direction.getDirection((forest.getXPosition()-peasant.getXPosition()), (forest.getYPosition()-peasant.getYPosition())));
+			return Action.createCompoundGather(peasant.getID(), forest.getID());
 		}
 		else if(action instanceof DepositAction){
 			System.out.println("Performing Deposit");

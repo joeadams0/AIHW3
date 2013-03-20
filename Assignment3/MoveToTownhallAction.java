@@ -8,7 +8,7 @@ public class MoveToTownhallAction implements StripsAction{
 	public boolean precondition(State state){
 		Peasant p = state.getPeasant();
 		Townhall t = state.getTownhall();
-		return state.getPeasant().hasCargo() && ((Math.abs(t.getX() - p.getX())>1 &&  (Math.abs(t.getX() - p.getY()))>1));
+		return p.hasCargo() && ((Math.abs(t.getX() - p.getX()) + (Math.abs(t.getX() - p.getY()))>2));
 	}
 	
 	// Moves to the townhall

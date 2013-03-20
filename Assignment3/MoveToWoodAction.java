@@ -7,8 +7,8 @@ public class MoveToWoodAction implements StripsAction{
 	// Has no wood
 	public boolean precondition(State state){
 		Peasant p = state.getPeasant();
-		Forest t = state.findClosestForest();
-		return !state.getPeasant().hasCargo() && ((Math.abs(t.getX() - p.getX())>1 &&  (Math.abs(t.getX() - p.getY()))>1));
+		Forest f = state.findClosestForest();
+		return !state.getPeasant().hasCargo() && ((Math.abs(f.getX() - p.getX()) + Math.abs(f.getX() - p.getY()))>2);
 	}
 	// Moves to the nearest Forest
 	public State postcondition(State state){

@@ -8,7 +8,7 @@ public class MoveToGoldAction implements StripsAction{
 	public boolean precondition(State state){
 		Peasant p = state.getPeasant();
 		GoldMine t = state.findClosestMine();
-		return !state.getPeasant().hasCargo() && ((Math.abs(t.getX() - p.getX())>1 &&  (Math.abs(t.getX() - p.getY()))>1));
+		return !state.getPeasant().hasCargo() && ((Math.abs(t.getX() - p.getX()) + Math.abs(t.getX() - p.getY()))>2) && (t.getGold()>=100);
 	}
 	// Moves to the nearest gold mine
 	public State postcondition(State state){

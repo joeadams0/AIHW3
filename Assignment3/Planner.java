@@ -27,9 +27,10 @@ public class Planner {
 			return null;
 		}
 		
+		/*System.out.println("Printing Open List:");
+		printOpenList(openList);*/
 		StateNode head = openList.peek();
 		openList.remove(head);
-
 
 		// If it is the goal state
 		if(head.reachesGoal(goalGold, goalWood)){
