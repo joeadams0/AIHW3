@@ -26,11 +26,18 @@ public class State{
 	}
 	
 	public Peasant getPeasant(){
-		return Peasants.get(0);
+		if(Peasants.size()>0){
+			return Peasants.get(0);
+		}
+		return null;
 	}
 
 	public List<Peasant> getPeasants(){
 		return Peasants;
+	}
+	
+	public void addPeasant(Peasant p){
+		Peasants.add(p);
 	}
 	
 	public int getGold(){
@@ -78,9 +85,7 @@ public class State{
 		if(Gold != state.getGold())
 			return false;
 		if(Wood != state.getWood())
-			return false;
-		if(!(peasant.equals(state.getPeasant())))
-			return false;			
+			return false;		
 		if(!(townhall.equals(state.getTownhall())))
 			return false;
 			
@@ -105,17 +110,17 @@ public class State{
 			peasants.add(peasant.clone());
 		}
 		
-		return new State(mines, forests, gold, wood, p, t);
+		return new State(mines, forests, gold, wood, peasants, t);
 	}
 	
 	public GoldMine findClosestMine(){
-		Peasant p = peasant;
-		return closestGold(p.getX(), p.getY());
+		Townhall t = townhall;
+		return closestGold(t.getX(), t.getY());
 	}
 	
 	public Forest findClosestForest(){
-		Peasant p = peasant;
-		return closestForest(p.getX(), p.getY());
+		Townhall t = townhall;
+		return closestForest(t.getX(), t.getY());
 	}
 
 	public GoldMine closestGold(int x, int y){
@@ -164,8 +169,12 @@ public class State{
 		}
 		str = str + "\n";
 		
+		for(Peasant peasant : Peasants){
+			str = str + peasant.toString() + "\n";
+		}
+		str = str + "\n";
+		
 		str = str + townhall.toString() + "\n";
-		str = str + peasant.toString() + "\n";
 		str = str + "Gold: " + Gold + "\n";
 		str = str + "Wood: " + Wood + "\n";
 		
@@ -181,7 +190,7 @@ public class State{
 		int heuristic = 0;
 		int goldNeeded = goalGold - Gold;
 		int woodNeeded = goalWood - Wood;
-
+		/*
 		if(goldNeeded <= 0 && woodNeeded <= 0){
 			return heuristic;
 		}
@@ -199,7 +208,7 @@ public class State{
 		else if (peasant.hasGold()){
 			heuristic += distToTownHall(peasant.getX(), peasant.getY())+1;
 			goldNeeded -= 100;
-		}
+		}*/
 		
 		GoldMine closestMine = closestGold(townhall.getX(), townhall.getY());
 		Forest closestForest = closestForest(townhall.getX(), townhall.getY());

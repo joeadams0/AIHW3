@@ -2,9 +2,9 @@
 	<Map>rc_3m5t.xml</Map>
 	<Player Id="0">
 		<AgentClass>
-			<ClassName>Assignment3.PlanningAgent</ClassName>
-			<Argument>200</Argument>
-			<Argument>200</Argument>
+			<ClassName>edu.cwru.sepia.agent.visual.VisualAgent</ClassName>
+<Argument>true</Argument>
+<Argument>false</Argument>
 		</AgentClass>
 	</Player>
 	<ModelParameters>

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Iterator;
 
 import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.action.ActionType;
@@ -49,15 +50,19 @@ public class PlanningAgent extends Agent {
 
 	StateView currentState;
 	StateNode currentNode;
+	Map<List<Integer>, StripsAction> busyPeasantManager;
 
 	@Override
 	public Map<Integer, Action> initialStep(StateView newstate, History.HistoryView statehistory) {
 		step = 0;
 		currentState = newstate;
-
+		busyPeasantManager = new HashMap<List<Integer>, StripsAction>();
+		
 		currentNode = plan();
-
 		StateNode root = currentNode;
+		int count = 0;
+		
+		System.out.println(count);
 		if(root!= null){
 			while(root.getChild() != null){
 				System.out.println(root.getNextAction());
@@ -79,14 +84,25 @@ public class PlanningAgent extends Agent {
 			return builder;
 		}
 
-		UnitView p = getPeasant();
-		State state = generateState();
-		//System.out.println("CurrentNode:\n" + currentNode.getState() + "\nCurrent State:\n" + state + "\nPrecondition:\n"+ currentNode.getNextAction().precondition(state));
+		checkBusyPeasants();
+		List<UnitView> idlePeasants = getIdlePeasants();
+		State state = null;
 		// Perform next action
-		if(currentNode.getNextAction().precondition(state)){
+		while(idlePeasants.size()>0){
+			state = generateState(generatePeasants(idlePeasants));
 			StripsAction action = currentNode.getNextAction();
-			builder.put(p.getID(), generateAction(p, action));
-			currentNode = currentNode.getChild();
+
+			if(action.precondition(state)){
+				List<Action> actions = generateActions(eligablePeasants(idlePeasants, action), action);
+				List<Integer> busyPeasants = new ArrayList<Integer>();
+				for(Action a : actions){
+					builder.put(a.getUnitId(), a);
+					busyPeasants.add(a.getUnitId());
+				}
+				busyPeasantManager.put(busyPeasants, action);
+				currentNode = currentNode.getChild();
+				idlePeasants = getIdlePeasants();
+			}
 		}
 		return builder;
 	}
@@ -123,40 +139,79 @@ public class PlanningAgent extends Agent {
 	public static String getUsage() {
 		return "Two arguments, amount of gold to gather and amount of wood to gather";
 	}
+	
 	@Override
 	public void savePlayerData(OutputStream os) {
 		//this agent lacks learning and so has nothing to persist.
 		
 	}
+	
 	@Override
 	public void loadPlayerData(InputStream is) {
 		//this agent lacks learning and so has nothing to persist.
 	}
 	
 	private StateNode plan(){
+		List<UnitView> idlePeasants = getIdlePeasants();
+		State state = generateState(generatePeasants(idlePeasants));
+		return Planner.plan(state, generateAllActions(state), goldRequired, woodRequired);
+	}
+	
+	private List<StripsAction> generateAllActions(State state){
 		List<StripsAction> actions = new ArrayList<StripsAction>();
-		
-		State state = generateState();
+		List<UnitView> p = getPeasants();
 		
 		DepositAction deposit = new DepositAction();
 		HarvestGoldAction harvestGold = new HarvestGoldAction();
 		HarvestWoodAction harvestWood = new HarvestWoodAction();
-		MoveToGoldAction moveToGold = new MoveToGoldAction();
-		MoveToWoodAction moveToWood = new MoveToWoodAction();
-		MoveToTownhallAction moveToTownhall = new MoveToTownhallAction();
+		DepositAction2 deposit2 = new DepositAction2();
+		HarvestGoldAction2 harvestGold2 = new HarvestGoldAction2();
+		HarvestWoodAction2 harvestWood2 = new HarvestWoodAction2();
+		DepositAction3 deposit3 = new DepositAction3();
+		HarvestGoldAction3 harvestGold3 = new HarvestGoldAction3();
+		HarvestWoodAction3 harvestWood3 = new HarvestWoodAction3();
 		
 		actions.add(deposit);
 		actions.add(harvestGold);
-		actions.add(harvestWood);
-		actions.add(moveToGold);
-		actions.add(moveToWood);
-		actions.add(moveToTownhall);
-
-		return Planner.plan(state, actions, goldRequired, woodRequired);
+		actions.add(harvestWood); 
+		actions.add(deposit2);
+		actions.add(harvestGold2);
+		actions.add(harvestWood2);
+		actions.add(deposit3);
+		actions.add(harvestGold3);
+		actions.add(harvestWood3);
+		
+		List<StripsLocation> locations = generateMoveLocations();
+		for(StripsLocation loc : locations){
+			actions.add(new MoveAction(loc));
+			actions.add(new MoveAction2(loc));
+			actions.add(new MoveAction3(loc));
+		}
+		
+		return actions;	
 	}
-
-	private State generateState(){
-		List<Peasant> p = null;
+	
+	private List<StripsLocation> generateMoveLocations(){
+		List<StripsLocation> locations = new ArrayList<StripsLocation>();
+		List<ResourceView> resources = currentState.getAllResourceNodes();
+		List<UnitView> units = currentState.getUnits(playernum);
+		for(ResourceView resource : resources){
+			if(resource.getType() == Type.TREE){
+				locations.add(generateForest(resource));
+			}
+			else
+				locations.add(generateGoldMine(resource));
+		}
+		for(UnitView unit : units){
+			String unitTypeName = unit.getTemplateView().getName();
+			if(unitTypeName.equals("TownHall")){
+				locations.add(generateTownhall(unit));
+			}
+		}
+		return locations;
+	}
+	
+	private State generateState(List<Peasant> p){
 		Townhall t = null;
 		List<GoldMine> mines = new ArrayList<GoldMine>();
 		List<Forest> forests = new ArrayList<Forest>();
@@ -164,10 +219,7 @@ public class PlanningAgent extends Agent {
 		List<UnitView> units = currentState.getUnits(playernum);
 		for(UnitView unit : units){
 			String unitTypeName = unit.getTemplateView().getName();
-			if(unitTypeName.equals("Peasant")){
-				p.add(generatePeasant(unit));
-			}
-			else if(unitTypeName.equals("TownHall")){
+			if(unitTypeName.equals("TownHall")){
 				t = generateTownhall(unit);
 			}
 		}
@@ -195,6 +247,14 @@ public class PlanningAgent extends Agent {
 		}
 		return p; 
 	}
+
+	private List<Peasant> generatePeasants(List<UnitView> units){
+		List<Peasant> peasants = new ArrayList<Peasant>();
+		for(UnitView unit : units){
+			peasants.add(generatePeasant(unit));
+		}
+		return peasants;
+	}
 	
 	private Townhall generateTownhall(UnitView unit){
 		return new Townhall(unit.getXPosition(), unit.getYPosition());
@@ -208,44 +268,112 @@ public class PlanningAgent extends Agent {
 		return new Forest(resource.getXPosition(), resource.getYPosition(), resource.getAmountRemaining());
 	}
 
-	private Action generateAction(UnitView peasant, StripsAction action){
-		if(action == null){
-			System.out.println("Error: Cannot find solution");
-			return null;
-		}
-		if(action instanceof MoveToTownhallAction){
-			System.out.println("Performing Move to Townhall");
-			UnitView townhall = getTownhall();
-			return Action.createCompoundMove(peasant.getID(), townhall.getXPosition(), townhall.getYPosition());
-		}
-		else if(action instanceof MoveToGoldAction){
-			System.out.println("Performing Move to GoldMine");
-			ResourceView mine = findNearestMine(peasant.getXPosition(), peasant.getYPosition());
-			return Action.createCompoundMove(peasant.getID(), mine.getXPosition(), mine.getYPosition());
-		}
-		else if(action instanceof MoveToWoodAction){
-			System.out.println("Performing Move to Forest");
-			ResourceView forest = findNearestForest(peasant.getXPosition(), peasant.getYPosition());
-			return Action.createCompoundMove(peasant.getID(), forest.getXPosition(), forest.getYPosition());
+	private List<Action> generateActions(List<UnitView> idlePeasants, StripsAction action){
+		List<Action> actions = new ArrayList<Action>();
+
+		if(action instanceof MoveAction){
+			StripsLocation loc = ((MoveAction)action).getLocation();
+			System.out.println("Performing Move to " + loc);
+			actions.add(generateMoveAction(idlePeasants.get(0), loc));
 		}
 		else if(action instanceof HarvestGoldAction){
 			System.out.println("Performing Harvest Gold");
-			ResourceView mine = findNearestMine(peasant.getXPosition(), peasant.getYPosition());
-			return Action.createCompoundGather(peasant.getID(), mine.getID());
+			UnitView p = idlePeasants.get(0);
+			ResourceView mine = findNearestMine(p.getXPosition(), p.getYPosition());
+			actions.add(generateGatherAction(p, mine));
 		}
 		else if(action instanceof HarvestWoodAction){
 			System.out.println("Performing Harvest Wood");
-			ResourceView forest = findNearestForest(peasant.getXPosition(), peasant.getYPosition());
-			return Action.createCompoundGather(peasant.getID(), forest.getID());
+			UnitView p = idlePeasants.get(0);
+			ResourceView forest = findNearestForest(p.getXPosition(), p.getYPosition());
+			actions.add(generateGatherAction(p, forest));
 		}
 		else if(action instanceof DepositAction){
 			System.out.println("Performing Deposit");
 			UnitView townhall = getTownhall();
-			return Action.createCompoundDeposit(peasant.getID(), townhall.getID());
+			actions.add(generateDepositAction(idlePeasants.get(0), townhall));
 		}
-		else{
-			return null;
+		else if(action instanceof MoveAction2){
+			StripsLocation loc = ((MoveAction)action).getLocation();
+			System.out.println("Performing Move2 to: " + loc);
+			actions.add(generateMoveAction(idlePeasants.get(0), loc));
+			actions.add(generateMoveAction(idlePeasants.get(1), loc));
 		}
+		else if(action instanceof HarvestGoldAction2){
+			System.out.println("Performing Harvest Gold2");
+			UnitView p1 = idlePeasants.get(0);
+			UnitView p2 = idlePeasants.get(1);
+			ResourceView mine1 = findNearestMine(p1.getXPosition(), p1.getYPosition());
+			ResourceView mine2 = findNearestMine(p2.getXPosition(), p2.getYPosition());
+			actions.add(generateGatherAction(p1, mine1));
+			actions.add(generateGatherAction(p2, mine2));
+		}
+		else if(action instanceof HarvestWoodAction2){
+			System.out.println("Performing Harvest Wood2");
+			UnitView p1 = idlePeasants.get(0);
+			UnitView p2 = idlePeasants.get(1);
+			ResourceView forest1 = findNearestForest(p1.getXPosition(), p1.getYPosition());
+			ResourceView forest2 = findNearestForest(p2.getXPosition(), p2.getYPosition());
+			actions.add(generateGatherAction(p1, forest1));
+			actions.add(generateGatherAction(p2, forest2));
+		}
+		else if(action instanceof DepositAction2){
+			System.out.println("Performing Deposit2");
+			UnitView townhall = getTownhall();
+			actions.add(generateDepositAction(idlePeasants.get(0), townhall));
+			actions.add(generateDepositAction(idlePeasants.get(1), townhall));
+		}
+		else if(action instanceof MoveAction3){
+			StripsLocation loc = ((MoveAction)action).getLocation();
+			System.out.println("Performing Move3 to: " + loc);
+			actions.add(generateMoveAction(idlePeasants.get(0), loc));
+			actions.add(generateMoveAction(idlePeasants.get(1), loc));
+			actions.add(generateMoveAction(idlePeasants.get(2), loc));
+		}
+		else if(action instanceof HarvestGoldAction3){
+			System.out.println("Performing Harvest Gold3");
+			UnitView p1 = idlePeasants.get(0);
+			UnitView p2 = idlePeasants.get(1);
+			UnitView p3 = idlePeasants.get(2);
+			ResourceView mine1 = findNearestMine(p1.getXPosition(), p1.getYPosition());
+			ResourceView mine2 = findNearestMine(p2.getXPosition(), p2.getYPosition());
+			ResourceView mine3 = findNearestMine(p3.getXPosition(), p3.getYPosition());
+			actions.add(generateGatherAction(p1, mine1));
+			actions.add(generateGatherAction(p2, mine2));
+			actions.add(generateGatherAction(p3, mine3));
+		}
+		else if(action instanceof HarvestWoodAction3){
+			System.out.println("Performing Harvest Wood3");
+			UnitView p1 = idlePeasants.get(0);
+			UnitView p2 = idlePeasants.get(1);
+			UnitView p3 = idlePeasants.get(2);
+			ResourceView forest1 = findNearestForest(p1.getXPosition(), p1.getYPosition());
+			ResourceView forest2 = findNearestForest(p2.getXPosition(), p2.getYPosition());
+			ResourceView forest3 = findNearestForest(p3.getXPosition(), p3.getYPosition());
+			actions.add(generateGatherAction(p1, forest1));
+			actions.add(generateGatherAction(p2, forest2));
+			actions.add(generateGatherAction(p3, forest3));
+		}
+		else if(action instanceof DepositAction3){
+			System.out.println("Performing Deposit3");
+			UnitView townhall = getTownhall();
+			actions.add(generateDepositAction(idlePeasants.get(0), townhall));
+			actions.add(generateDepositAction(idlePeasants.get(1), townhall));
+			actions.add(generateDepositAction(idlePeasants.get(2), townhall));
+		}
+		return actions;
+	}
+	
+	private Action generateMoveAction(UnitView peasant, StripsLocation loc){
+		return Action.createCompoundMove(peasant.getID(), loc.getX(), loc.getY());
+	}
+	
+	private Action generateGatherAction(UnitView peasant, ResourceView resource){
+		return Action.createCompoundGather(peasant.getID(), resource.getID());
+	}
+	
+	private Action generateDepositAction(UnitView peasant, UnitView townhall){
+		return Action.createCompoundDeposit(peasant.getID(), townhall.getID());
 	}
 
 	private ResourceView findNearestResource(int x, int y, Type type){
@@ -269,17 +397,64 @@ public class PlanningAgent extends Agent {
 		return findNearestResource(x, y, Type.TREE);
 	}
 
-	private UnitView getPeasant(){
+	private List<UnitView> getPeasants(){
 		List<UnitView> units = currentState.getUnits(playernum);
+		List<UnitView> peasants = new ArrayList<UnitView>();
 		for(UnitView unit : units){
 			String unitTypeName = unit.getTemplateView().getName();
 			if(unitTypeName.equals("Peasant")){
-				return unit;
+				peasants.add(unit);
 			}
 		}
-		return null;
+		return peasants;
 	}
 
+	private List<UnitView> getIdlePeasants(){
+		List<UnitView> freePeasants = getPeasants();
+		for(List<Integer> bPeasants : busyPeasantManager.keySet()){
+			for(Integer i : bPeasants){
+				Iterator<UnitView> itr = freePeasants.iterator();
+				while(itr.hasNext()){
+					if(i.intValue() == itr.next().getID()){
+						itr.remove();
+					}
+				}
+			}
+		}
+		return freePeasants;
+	}
+
+	private List<UnitView> eligablePeasants(List<UnitView> units, StripsAction action){
+		List<Peasant> peasants = action.findEligablePeasants(generateState(generatePeasants(units)));
+		List<UnitView> eligablePeasants = new ArrayList<UnitView>();
+		for(Peasant p : peasants){
+			for(UnitView unit : units){
+				if(unit.getXPosition() == p.getX() && unit.getYPosition() == p.getY()){
+					eligablePeasants.add(unit);
+				}
+			}
+		}
+		return eligablePeasants;
+	}
+	
+	private void checkBusyPeasants(){
+		Iterator<List<Integer>> itr = busyPeasantManager.keySet().iterator();
+		List<Integer> key;
+		State state;
+		while(itr.hasNext()){
+			key = itr.next();
+			List<UnitView> busyPeasants = new ArrayList<UnitView>();
+			for(Integer i : key){
+				busyPeasants.add(currentState.getUnit(i.intValue()));
+			}
+			state = generateState(generatePeasants(busyPeasants));
+			StripsAction action = busyPeasantManager.get(key);
+			if(!action.precondition(state)){
+				busyPeasantManager.remove(key);
+			}
+		}
+	}
+	
 	private UnitView getTownhall(){
 		List<UnitView> units = currentState.getUnits(playernum);
 		for(UnitView unit : units){
@@ -302,4 +477,5 @@ public class PlanningAgent extends Agent {
 	private int getCurrentWood(){
 		return currentState.getResourceAmount(playernum, ResourceType.WOOD);
 	}
+
 }
