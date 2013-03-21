@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Iterator;
+import java.io.*;
 
 import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.action.ActionType;
@@ -60,14 +61,17 @@ public class PlanningAgent extends Agent {
 		
 		currentNode = plan();
 		StateNode root = currentNode;
-		int count = 0;
-		
-		System.out.println(count);
-		if(root!= null){
-			while(root.getChild() != null){
-				System.out.println(root.getNextAction());
-				root = root.getChild();
+		try{
+			PrintWriter out = new PrintWriter(new FileWriter("plan.txt")); 
+			if(root!= null){
+				while(root.getChild() != null){
+					out.println(root.getNextAction());
+					root = root.getChild();
+				}
 			}
+			out.close();
+		}
+		catch(IOException ex){
 		}
 		return middleStep(newstate, statehistory);
 	}
@@ -273,34 +277,34 @@ public class PlanningAgent extends Agent {
 
 		if(action instanceof MoveAction){
 			StripsLocation loc = ((MoveAction)action).getLocation();
-			System.out.println("Performing Move to " + loc);
+			//System.out.println("Performing Move to " + loc);
 			actions.add(generateMoveAction(idlePeasants.get(0), loc));
 		}
 		else if(action instanceof HarvestGoldAction){
-			System.out.println("Performing Harvest Gold");
+			//System.out.println("Performing Harvest Gold");
 			UnitView p = idlePeasants.get(0);
 			ResourceView mine = findNearestMine(p.getXPosition(), p.getYPosition());
 			actions.add(generateGatherAction(p, mine));
 		}
 		else if(action instanceof HarvestWoodAction){
-			System.out.println("Performing Harvest Wood");
+			//System.out.println("Performing Harvest Wood");
 			UnitView p = idlePeasants.get(0);
 			ResourceView forest = findNearestForest(p.getXPosition(), p.getYPosition());
 			actions.add(generateGatherAction(p, forest));
 		}
 		else if(action instanceof DepositAction){
-			System.out.println("Performing Deposit");
+			//System.out.println("Performing Deposit");
 			UnitView townhall = getTownhall();
 			actions.add(generateDepositAction(idlePeasants.get(0), townhall));
 		}
 		else if(action instanceof MoveAction2){
 			StripsLocation loc = ((MoveAction)action).getLocation();
-			System.out.println("Performing Move2 to: " + loc);
+			//System.out.println("Performing Move2 to: " + loc);
 			actions.add(generateMoveAction(idlePeasants.get(0), loc));
 			actions.add(generateMoveAction(idlePeasants.get(1), loc));
 		}
 		else if(action instanceof HarvestGoldAction2){
-			System.out.println("Performing Harvest Gold2");
+		//	System.out.println("Performing Harvest Gold2");
 			UnitView p1 = idlePeasants.get(0);
 			UnitView p2 = idlePeasants.get(1);
 			ResourceView mine1 = findNearestMine(p1.getXPosition(), p1.getYPosition());
@@ -309,7 +313,7 @@ public class PlanningAgent extends Agent {
 			actions.add(generateGatherAction(p2, mine2));
 		}
 		else if(action instanceof HarvestWoodAction2){
-			System.out.println("Performing Harvest Wood2");
+			//System.out.println("Performing Harvest Wood2");
 			UnitView p1 = idlePeasants.get(0);
 			UnitView p2 = idlePeasants.get(1);
 			ResourceView forest1 = findNearestForest(p1.getXPosition(), p1.getYPosition());
@@ -318,20 +322,20 @@ public class PlanningAgent extends Agent {
 			actions.add(generateGatherAction(p2, forest2));
 		}
 		else if(action instanceof DepositAction2){
-			System.out.println("Performing Deposit2");
+			//System.out.println("Performing Deposit2");
 			UnitView townhall = getTownhall();
 			actions.add(generateDepositAction(idlePeasants.get(0), townhall));
 			actions.add(generateDepositAction(idlePeasants.get(1), townhall));
 		}
 		else if(action instanceof MoveAction3){
 			StripsLocation loc = ((MoveAction)action).getLocation();
-			System.out.println("Performing Move3 to: " + loc);
+			//System.out.println("Performing Move3 to: " + loc);
 			actions.add(generateMoveAction(idlePeasants.get(0), loc));
 			actions.add(generateMoveAction(idlePeasants.get(1), loc));
 			actions.add(generateMoveAction(idlePeasants.get(2), loc));
 		}
 		else if(action instanceof HarvestGoldAction3){
-			System.out.println("Performing Harvest Gold3");
+			//System.out.println("Performing Harvest Gold3");
 			UnitView p1 = idlePeasants.get(0);
 			UnitView p2 = idlePeasants.get(1);
 			UnitView p3 = idlePeasants.get(2);
@@ -343,7 +347,7 @@ public class PlanningAgent extends Agent {
 			actions.add(generateGatherAction(p3, mine3));
 		}
 		else if(action instanceof HarvestWoodAction3){
-			System.out.println("Performing Harvest Wood3");
+			//System.out.println("Performing Harvest Wood3");
 			UnitView p1 = idlePeasants.get(0);
 			UnitView p2 = idlePeasants.get(1);
 			UnitView p3 = idlePeasants.get(2);
@@ -355,7 +359,7 @@ public class PlanningAgent extends Agent {
 			actions.add(generateGatherAction(p3, forest3));
 		}
 		else if(action instanceof DepositAction3){
-			System.out.println("Performing Deposit3");
+			//System.out.println("Performing Deposit3");
 			UnitView townhall = getTownhall();
 			actions.add(generateDepositAction(idlePeasants.get(0), townhall));
 			actions.add(generateDepositAction(idlePeasants.get(1), townhall));

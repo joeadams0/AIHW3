@@ -88,7 +88,6 @@ public class State{
 			return false;		
 		if(!(townhall.equals(state.getTownhall())))
 			return false;
-			
 		return true;
 	}
 	
@@ -156,6 +155,48 @@ public class State{
 
 	}
 	
+	public List<GoldMine> sortedMines(){
+		List<GoldMine> sortedMines = new ArrayList<GoldMine>();
+		for(GoldMine mine : GoldMines){
+			sortedMines.add(mine.clone());
+		}
+		for(int i = 0; i < sortedMines.size(); i++){
+			int minDist = Integer.MAX_VALUE;
+			GoldMine closestMine = null;;
+			for(int j = i; j<sortedMines.size(); j++){
+				GoldMine mine = sortedMines.get(j);
+				if(distToTownHall(mine.getX(), mine.getY()) <minDist){
+					minDist = distToTownHall(mine.getX(), mine.getY());	
+					closestMine = mine;
+				}
+			}
+			sortedMines.remove(closestMine);
+			sortedMines.add(i, closestMine);
+		}
+		return sortedMines;
+	}
+	
+	public List<Forest> sortedForests(){
+		List<Forest> sortedMines = new ArrayList<Forest>();
+		for(Forest mine : Forests){
+			sortedMines.add(mine.clone());
+		}
+		for(int i = 0; i < sortedMines.size(); i++){
+			int minDist = Integer.MAX_VALUE;
+			Forest closestMine = null;
+			for(int j = i; j<sortedMines.size(); j++){
+				Forest mine = sortedMines.get(j);
+				if(distToTownHall(mine.getX(), mine.getY()) <minDist){
+					minDist = distToTownHall(mine.getX(), mine.getY());	
+					closestMine = mine;
+				}
+			}
+			sortedMines.remove(closestMine);
+			sortedMines.add(i, closestMine);
+		}
+		return sortedMines;
+	}
+	
 	public String toString(){
 		String str = "State:\n";
 		for(GoldMine mine : GoldMines){
@@ -193,7 +234,35 @@ public class State{
 			return heuristic;
 		}
 		
-		//start new stuff
+		List<GoldMine> mines = sortedMines();
+		List<Forest> forests = sortedForests();
+		
+		for(Peasant p : Peasants){
+			heuristic += distToTownHall(p.getX(), p.getY());
+			if(p.hasWood()){
+				woodNeeded -= 100;
+			}
+			if(p.hasGold()){
+				goldNeeded -= 100;
+			}
+		}
+		for(GoldMine mine : mines){
+			while(mine.getGold()>0 && goldNeeded>0){
+				heuristic += distToTownHall(mine.getX(), mine.getY()) * 2;
+				goldNeeded -= 100;
+				mine.setGold(mine.getGold() - 100);
+			}
+		}
+		
+		for(Forest forest : forests){
+			while(forest.getWood()>0 && woodNeeded>0){
+				heuristic += distToTownHall(forest.getX(), forest.getY()) * 2;
+				woodNeeded -= 100;
+				forest.setWood(forest.getWood() - 100);
+			}
+		}
+		
+		/*//start new stuff
 		int actionsRequired = 0;
 		if(goldNeeded > 0)
 			actionsRequired += (goldNeeded/100)*4;
@@ -219,7 +288,6 @@ public class State{
 			}
 		}
 		heuristic = (int)Math.ceil((double)actionsRequired/(double)Peasants.size());
-		/*
 		if(goldNeeded<0){
 			heuristic -= goldNeeded;
 		}
@@ -243,8 +311,11 @@ public class State{
 		if(woodNeeded > 0)
 			heuristic += (2*(distToTownHall(closestForest.getX(), closestForest.getY())) + 1) * (woodNeeded/100);
       */
-	
-		return heuristic;
+		int numPeasants = Peasants.size();
+		if(numPeasants == 0){
+			numPeasants = 1;
+		}
+		return heuristic/numPeasants;
 	}
 	
 	private int dist(int x1, int y1, int x2, int y2){

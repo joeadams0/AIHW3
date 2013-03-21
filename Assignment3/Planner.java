@@ -21,44 +21,44 @@ public class Planner {
 		return search(openList, closedList, actions, goalGold, goalWood);
 	}
 	private static StateNode search(PriorityQueue<StateNode> openList, List<StateNode> closedList, List<StripsAction> actions, int goalGold, int goalWood){
-		if(openList.size() <=0){
-			// No path to be found
-			System.out.println("No Path Can be Found!");
-			return null;
-		}
 		
-		/*System.out.println("Printing Open List:");
-		printOpenList(openList);*/
-		StateNode head = openList.peek();
-		openList.remove(head);
-
-		// If it is the goal state
-		if(head.reachesGoal(goalGold, goalWood)){
-			// Get path back to root
-			return searchComplete(head);
-		}
-		
-		// Expand Node
-		else{
-			List<StateNode> neighbors = possibleMoves(head, actions, goalGold, goalWood);
-			StateNode neighbor = null;
-			for(int i = 0; i < neighbors.size(); i++){
-				neighbor = neighbors.get(i);
-				// If it is not in the closed list
-				if(!(closedList.contains(neighbor))){
-					// If it is already on the open list
-					if(openList.contains(neighbor)){
-						updateNode(openList, neighbor);
-					}
-					// Add it to the open List
-					else {
-						openList.add(neighbor);
+		while(openList.size()>0){
+			
+			StateNode head = openList.peek();
+			openList.remove(head);
+			/*System.out.println("\nExpanding Node...");
+			System.out.println(head);
+			System.out.println("\nPrinting Open List: " + openList.size());
+			printOpenList(openList);*/
+			// If it is the goal state
+			if(head.reachesGoal(goalGold, goalWood)){
+				// Get path back to root
+				return searchComplete(head);
+			}
+			
+			// Expand Node
+			else{
+				List<StateNode> neighbors = possibleMoves(head, actions, goalGold, goalWood);
+				StateNode neighbor = null;
+				for(int i = 0; i < neighbors.size(); i++){
+					neighbor = neighbors.get(i);
+					// If it is not in the closed list
+					if(!(closedList.contains(neighbor))){
+						// If it is already on the open list
+						if(openList.contains(neighbor)){
+							updateNode(openList, neighbor);
+						}
+						// Add it to the open List
+						else {
+							openList.add(neighbor);
+						}
 					}
 				}
+				closedList.add(head);
 			}
-			closedList.add(head);
-			return search(openList, closedList, actions, goalGold, goalWood);
 		}
+		System.out.println("No solution found!");
+		return null;
 	}
 	//If the node is already in the openlist, it updates the cost if it is shorter. 
 	private static void updateNode(PriorityQueue<StateNode> openList, StateNode neighbor){

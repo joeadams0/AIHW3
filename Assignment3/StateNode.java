@@ -73,7 +73,7 @@ public class StateNode implements Comparable<StateNode> {
     }
 
     public String toString(){
-    	return "StateNode:\n" + parentAction + "\n"+ state + "\nCost: " + cost +"\n";
+    	return "StateNode:\n" + parentAction + "\n"+ state + "\nCost: " + cost + "\nHeuristic: " + state.heuristic(goalGold, goalWood) + "\nTotal Cost:" + totalEstimatedCost() + "\n";
     }
 }
 
